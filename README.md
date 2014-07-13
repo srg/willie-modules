@@ -1,5 +1,6 @@
 # willie-modules
-##*- a repository of modules for [willie](http://willie.dftba.net/)* 
+
+*- a repository of modules for [willie](http://willie.dftba.net/)* 
 
 ###installation
 the repository follows willie's local configuration folder's (`~/.willie/`) structure,
