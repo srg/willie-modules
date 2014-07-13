@@ -1,0 +1,10 @@
+{
+    "module-list": {
+        "gdq_sched": "commands for the gamesdonequick marathon schedules",
+        "srl": "emulating racebot's .races on speedrunslive.com",
+        "streams": "streams outputs online streams from the list in conf-module/streams.json",
+        "thread": "thread gives the /srg/ 4chan thread with most recent activity",
+        "twitch": "twitch search, kind of",
+        "webload": "this is me"
+    }
+}
