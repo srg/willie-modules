@@ -3,6 +3,7 @@ import willie.module
 import requests
 
 @willie.module.commands("races")
+@willie.module.thread(True)
 # @willie.module.rate("60")
 def races(bot, trigger):
     json = requests.get("http://api.speedrunslive.com/races/").json()
