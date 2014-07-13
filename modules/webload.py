@@ -16,7 +16,7 @@ def webload(bot, trigger):
     if not module_name or module_name == bot.config.owner:
         return bot.reply("Literally What?")
 
-    format_url = "https://raw.githubusercontent.com/teamsrg/willie/master/willie/modules/{0}.py"
+    format_url = "https://raw.githubusercontent.com/teamsrg/willie-modules/master/modules/{0}.py"
     module_dir = os.path.dirname(os.path.realpath(__file__))
     with open("{0}/{1}.py".format(module_dir, module_name), "wb") as fh:
         resp = requests.get(format_url.format(module_name), stream=True)
