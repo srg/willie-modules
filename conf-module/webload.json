@@ -3,22 +3,22 @@
         "gdq_sched": {
             "comment": "commands for the gamesdonequick.com marathon schedules",
             "depends": null,
-            "state": "experimental",
+            "state": "experimental"
         },
         "srl": {
             "comment": "emulating racebot's .races on speedrunslive.com",
             "depends": null,
-            "state": "experimental",
+            "state": "experimental"
         },
         "streams": {
             "comment": "streams outputs online streams from the list in conf-module/streams.json",
             "depends": "conf-module/streams.json",
-            "state": "experimental",
+            "state": "experimental"
         },
         "thread": {
             "comment": "thread gives the /srg/ 4chan thread with most recent activity",
             "depends": null,
-            "state": "stable",
+            "state": "stable"
         },
         "twitch": {
             "comment": "twitch search, kind of",
@@ -28,6 +28,7 @@
         "webload": {
             "comment": "this is me",
             "depends": "conf-module/webload.json",
-            "state: "experimental"
+            "state": "experimental"
+        }
     }
 }
