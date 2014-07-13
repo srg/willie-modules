@@ -1,10 +1,33 @@
 {
     "module-list": {
-        "gdq_sched": "commands for the gamesdonequick marathon schedules",
-        "srl": "emulating racebot's .races on speedrunslive.com",
-        "streams": "streams outputs online streams from the list in conf-module/streams.json",
-        "thread": "thread gives the /srg/ 4chan thread with most recent activity",
-        "twitch": "twitch search, kind of",
-        "webload": "this is me"
+        "gdq_sched": {
+            "comment": "commands for the gamesdonequick.com marathon schedules",
+            "depends": null,
+            "state": "experimental",
+        },
+        "srl": {
+            "comment": "emulating racebot's .races on speedrunslive.com",
+            "depends": null,
+            "state": "experimental",
+        },
+        "streams": {
+            "comment": "streams outputs online streams from the list in conf-module/streams.json",
+            "depends": "conf-module/streams.json",
+            "state": "experimental",
+        },
+        "thread": {
+            "comment": "thread gives the /srg/ 4chan thread with most recent activity",
+            "depends": null,
+            "state": "stable",
+        },
+        "twitch": {
+            "comment": "twitch search, kind of",
+            "depends": null,
+            "state": "experimental"
+        },
+        "webload": {
+            "comment": "this is me",
+            "depends": "conf-module/webload.json",
+            "state: "experimental"
     }
 }
