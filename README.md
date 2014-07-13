@@ -10,7 +10,7 @@ in addition, we also have a conf-module/ folder containing configurations for so
 one could also use git to clone this repo into one's own ~/.willie/ folder:
 
 - `cd ~/.willie/`
-- `git clone https://github.com/teamsrg/willie-modules.git`
+- `git clone https://github.com/teamsrg/willie-modules.git .`
 - shitpost
 
 a future solution will allow administrators of willie to use the webload module to download and install modules
