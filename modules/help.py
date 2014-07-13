@@ -13,19 +13,25 @@ from willie.module import commands, rule, example, priority
 from willie.tools import iterkeys
 
 
+def setup(bot):
+    global admin_only
+    admin_only = ["blocks", "join", "load", "me", "mode", "msg", "part", "quit", "reload", "save", "set", "update", "webload"]
+
+
 @rule('$nick' '(?i)(help|doc) +([A-Za-z]+)(?:\?+)?$')
 @example('.help tell')
 @commands('help')
 @priority('low')
 def help(bot, trigger):
     """Shows a command's documentation, and possibly an example."""
+    global admin_only
     if not trigger.group(2):
         bot.reply('Say .help <command> (for example .help c) to get help for a command, or .commands for a list of commands.')
     else:
         name = trigger.group(2)
         name = name.lower()
 
-        if name in bot.doc:
+        if name in bot.doc and name not in admin_only:
             bot.reply(bot.doc[name][0])
             if bot.doc[name][1]:
                 bot.say('e.g. ' + bot.doc[name][1])
@@ -35,7 +41,7 @@ def help(bot, trigger):
 @priority('low')
 def commands(bot, trigger):
     """Return a list of bot's commands"""
-    admin_only = ["blocks", "join", "load", "me", "mode", "msg", "part", "quit", "reload", "save", "set", "update", "webload"]
+    global admin_only
     names_list = sorted(iterkeys(bot.doc))
     names_list_send = []
     for i in range(len(names_list)): # sketchy as shit
