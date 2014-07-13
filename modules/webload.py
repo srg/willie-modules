@@ -7,9 +7,7 @@ from os.path import expanduser
 
 def setup(bot):
     global modulelist
-    f = requests.get("https://raw.githubusercontent.com/teamsrg/willie-modules/conf-module/webload.json", stream=True)
-    modulelist = json.load(f)
-    f.close()
+    modulelist = requests.get("https://raw.githubusercontent.com/teamsrg/willie-modules/conf-module/master/webload.json").json()
 
 @willie.module.nickname_commands("webload")
 @willie.module.priority("low")
