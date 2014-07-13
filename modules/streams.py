@@ -9,6 +9,7 @@ def setup(bot):
 
 @willie.module.commands('streams')
 def streams(bot,trigger):
+    """Sends the channel a list of currently live streams in a list"""
     global twitchlist
     streamers = []
     online = []
