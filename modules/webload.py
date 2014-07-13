@@ -11,7 +11,7 @@ def setup(bot):
 
 @willie.module.nickname_commands("webload")
 @willie.module.priority("low")
-@willie.module.example("weblaod list, webload install")
+@willie.module.example("webload list, webload install")
 @willie.module.thread(False)
 def webload(bot, trigger):
     """Does the same thing as 'reload.load' except loads the module from the repository"""
@@ -21,7 +21,7 @@ def webload(bot, trigger):
     if trigger.group(3) == "list":
         bot.say("Available modules:")
         for mod, val in modulelist["module-list"].items():
-            bot.say(mod + ": "  + val)
+            bot.say("[\x033" + val["state"] + "\x03] \x037" + mod + ": \x0312"  + val["comment"])
     elif trigger.group(3) == "install":
         module_name = trigger.group(4)
         if not module_name or module_name == bot.config.owner:
