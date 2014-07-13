@@ -7,7 +7,7 @@ from os.path import expanduser
 
 def setup(bot):
     global modulelist
-    modulelist = requests.get("https://raw.githubusercontent.com/teamsrg/willie-modules/conf-module/master/webload.json").json()
+    modulelist = requests.get("https://raw.githubusercontent.com/teamsrg/willie-modules/master/conf-module/webload.json").json()
 
 @willie.module.nickname_commands("webload")
 @willie.module.priority("low")
@@ -16,13 +16,12 @@ def webload(bot, trigger):
     global modulelist
     if not trigger.admin:
         return
-    if trigger.group(2) == "list":
+    if trigger.group(3) == "list":
         bot.say("Available modules:")
         for mod, val in modulelist["module-list"].items():
             bot.say(mod + ": "  + val)
-            
-    elif trigger.group(2) == "install":
-        module_name = trigger.group(3)
+    elif trigger.group(3) == "install":
+        module_name = trigger.group(4)
         if not module_name or module_name == bot.config.owner:
             return bot.reply("Literally What?")
 
@@ -44,7 +43,7 @@ def webload(bot, trigger):
         bot.bind_commands()
 
         bot.reply(module)
-    elif not trigger.group(2):
+    elif not trigger.group(3):
         bot.say("Usage: !weblist list, !weblist install module")
 
 # same for pms
