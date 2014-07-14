@@ -83,6 +83,15 @@ def webload(bot, trigger):
         for mod, val in modulelist["modulelist"].items():
             if os.path.isfile(williedir + "/modules/" + mod + ".py"):
                 sync(bot, mod)
+    elif trigger.group(3) == "remove":
+        removethis = williedir + "/modules/" + trigger.group(4)
+        if os.path.isfile(removethis + ".py"):
+            os.remove(removethis + ".py")
+            os.remove(removethis + ".pyc")
+            bot.say("\x037" + trigger.group(4) + "\x03 removed.")
+            # test
+        else:
+            bot.say("fug of :-D")
     elif not trigger.group(3):
         bot.say("Usage: !weblist list, !weblist sync module, !weblist update")
 
