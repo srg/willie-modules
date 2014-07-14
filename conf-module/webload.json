@@ -1,5 +1,5 @@
 {
-    "module-list": {
+    "modulelist": {
         "gdq_sched": {
             "comment": "commands for the gamesdonequick.com marathon schedules",
             "depends": null,
@@ -32,7 +32,7 @@
         },
         "esa_sched": {
             "comment": "commands for the europeanspeedsterassembly.com marathon schedules",
-            "depends": ["conf-module/esalong.tsv","conf-module/esashort.tsv"],
+            "depends": ["conf-module/esalong.tsv", "conf-module/esashort.tsv"],
             "state": "future"
         }
     }

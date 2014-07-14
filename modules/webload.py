@@ -22,12 +22,17 @@ def webload(bot, trigger):
     if trigger.group(3) == "list":
         bot.say("Available modules:")
         for mod, val in modulelist["modulelist"].items():
+<<<<<<< HEAD
             if os.path.isfile(module_dir + "/" + mod + ".py"):
                 comment = val["comment"] + " \x03[installed]"
             else:
                 comment = val["comment"]
             bot.say("[\x033" + val["state"] + "\x03] \x037" + mod + ": \x0312"  + comment)
     elif trigger.group(3) == "sync":
+=======
+            bot.say("[\x033" + val["state"] + "\x03] \x037" + mod + ": \x0312"  + val["comment"])
+    elif trigger.group(3) == "install":
+>>>>>>> a8e55a29ab040495646ccf5d08b7aaf97b2858dc
         module_name = trigger.group(4)
         if not module_name or module_name == bot.config.owner:
             return bot.reply("Literally What?")
