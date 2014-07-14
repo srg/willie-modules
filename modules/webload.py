@@ -11,24 +11,28 @@ def setup(bot):
 
 @willie.module.nickname_commands("webload")
 @willie.module.priority("low")
-@willie.module.example("webload list, webload install")
+@willie.module.example("webload list, webload sync")
 @willie.module.thread(True)
 def webload(bot, trigger):
     """Does the same thing as 'reload.load' except loads the module from the repository"""
+    module_dir = os.path.dirname(os.path.realpath(__file__))
     global modulelist
     if not trigger.admin:
         return
     if trigger.group(3) == "list":
         bot.say("Available modules:")
-        for mod, val in modulelist["module-list"].items():
-            bot.say("[\x033" + val["state"] + "\x03] \x037" + mod + ": \x0312"  + val["comment"])
-    elif trigger.group(3) == "install":
+        for mod, val in modulelist["modulelist"].items():
+            if os.path.isfile(module_dir + "/" + mod + ".py"):
+                comment = val["comment"] + " \x03[installed]"
+            else:
+                comment = val["comment"]
+            bot.say("[\x033" + val["state"] + "\x03] \x037" + mod + ": \x0312"  + comment)
+    elif trigger.group(3) == "sync":
         module_name = trigger.group(4)
         if not module_name or module_name == bot.config.owner:
             return bot.reply("Literally What?")
-
+        
         format_url = "https://raw.githubusercontent.com/teamsrg/willie-modules/master/modules/{0}.py"
-        module_dir = os.path.dirname(os.path.realpath(__file__))
         with open("{0}/{1}.py".format(module_dir, module_name), "wb") as fh:
             resp = requests.get(format_url.format(module_name), stream=True)
             if resp.status_code is not requests.codes.ok:
