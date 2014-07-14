@@ -7,11 +7,13 @@ the repository follows willie's local configuration folder's ~/.willie/ structur
 where modules from this repository (located in modules/), would be placed in ~/.willie/modules/.
 in addition, we also have a conf-module/ folder containing configurations for some modules.
 
-one could also use git to clone this repo into one's own ~/.willie/ folder:
+one could also use git to clone this repo into one's own ~/.willie/ folder (this is not recommended as many of our modules are likely to be broken):
 
 - `cd ~/.willie/`
 - `git clone https://github.com/teamsrg/willie-modules.git .`
 - shitpost
 
-a future solution will allow administrators of willie to use the webload module to download and install modules
-directly from this repo.
+the webload module can also be used to install modules from our repo. when installed and loaded,
+use `webload list` for currently available modules, and `webload install module` to install desired module.
+
+**please note that almost everything here is written and maintained by dumb ppl**
