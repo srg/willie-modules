@@ -8,6 +8,7 @@ def setup(bot):
     f.close()
 
 @willie.module.commands('streams')
+@willie.module.thread(True)
 def streams(bot,trigger):
     """Sends the channel a list of currently live streams in a list"""
     global twitchlist

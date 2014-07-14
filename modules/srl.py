@@ -4,11 +4,12 @@ import requests
 
 
 def setup(bot):
-    update_races()
+    update_races(bot)
 
 
 @willie.module.interval(60)
-def update_races():
+@willie.module.thread(True)
+def update_races(bot):
     global races_json
     races_json = requests.get("http://api.speedrunslive.com/races/").json()
 

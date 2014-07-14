@@ -1,6 +1,7 @@
 import willie, requests
 
 @willie.module.commands('thread')
+@willie.module.thread(True)
 def thread(bot, trigger):
     """Sends the channel the link to the current /srg/ thread"""
     r = requests.get('http://a.4cdn.org/vg/catalog.json')

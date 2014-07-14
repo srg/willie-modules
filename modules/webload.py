@@ -12,7 +12,7 @@ def setup(bot):
 @willie.module.nickname_commands("webload")
 @willie.module.priority("low")
 @willie.module.example("webload list, webload install")
-@willie.module.thread(False)
+@willie.module.thread(True)
 def webload(bot, trigger):
     """Does the same thing as 'reload.load' except loads the module from the repository"""
     global modulelist
