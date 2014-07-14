@@ -1,17 +1,17 @@
 # coding=utf-8
-import willie.module
-import requests
+import willie.module, requests
+from datetime import datetime
 
 
 def setup(bot):
     update_races(bot)
 
 
-@willie.module.interval(60)
 @willie.module.thread(True)
 def update_races(bot):
-    global races_json
+    global races_json, races_last_updated
     races_json = requests.get("http://api.speedrunslive.com/races/").json()
+    races_last_updated = int(datetime.now().strftime("%s"))
 
 
 @willie.module.commands("races")
@@ -19,9 +19,12 @@ def update_races(bot):
 @willie.module.rate(60)
 def races(bot, trigger):
     """Notices person a list of all the current races"""
-    global races_json
+    global races_json, races_last_updated
     if not races_json:
         return
+    # if the racelist was last updated over a minute ago
+    if int(datetime.now().strftime("%s")) - races_last_updated > 60:
+        update_races(bot)
     num = 1
     for i in range(0, int(races_json["count"])):
         r = races_json["races"][i]
