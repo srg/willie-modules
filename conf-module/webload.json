@@ -6,17 +6,17 @@
             "state": "experimental"
         },
         "srl": {
-            "comment": "emulating racebot's .races on speedrunslive.com",
+            "comment": "emulates racebot's .races on speedrunslive.com",
             "depends": null,
             "state": "experimental"
         },
         "streams": {
-            "comment": "streams outputs online streams from the list in conf-module/streams.json",
+            "comment": "outputs online streams from the list in conf-module/streams.json",
             "depends": "conf-module/streams.json",
             "state": "experimental"
         },
         "thread": {
-            "comment": "thread gives the /srg/ 4chan thread with most recent activity",
+            "comment": "gives the /srg/ 4chan thread with most recent activity",
             "depends": null,
             "state": "stable"
         },
@@ -29,6 +29,10 @@
             "comment": "this is me",
             "depends": "conf-module/webload.json",
             "state": "experimental"
-        }
+        },
+        "esa_sched": {
+            "comment": "commands for the europeanspeedsterassembly.com marathon schedules",
+            "depends": ["conf-module/esalong.tsv","conf-module/esashort.tsv"],
+            "state": "future"
     }
 }
