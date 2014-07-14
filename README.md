@@ -14,6 +14,6 @@ one could also use git to clone this repo into one's own ~/.willie/ folder (this
 - shitpost
 
 the webload module can also be used to install modules from our repo. when installed and loaded,
-use `webload list` for currently available modules, and `webload install module` to install desired module.
+use `webload list` for currently available modules, `webload sync module` to install desired module, and `webload update` to update all installed modules.
 
 **please note that almost everything here is written and maintained by plebs**
