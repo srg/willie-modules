@@ -19,24 +19,18 @@ def webload(bot, trigger):
     global modulelist
     if not trigger.admin:
         return
-    if trigger.group(3) == "list":
+    elif trigger.group(3) == "list":
         bot.say("Available modules:")
         for mod, val in modulelist["modulelist"].items():
-<<<<<<< HEAD
             if os.path.isfile(module_dir + "/" + mod + ".py"):
                 comment = val["comment"] + " \x03[installed]"
             else:
                 comment = val["comment"]
             bot.say("[\x033" + val["state"] + "\x03] \x037" + mod + ": \x0312"  + comment)
     elif trigger.group(3) == "sync":
-=======
-            bot.say("[\x033" + val["state"] + "\x03] \x037" + mod + ": \x0312"  + val["comment"])
-    elif trigger.group(3) == "install":
->>>>>>> a8e55a29ab040495646ccf5d08b7aaf97b2858dc
         module_name = trigger.group(4)
         if not module_name or module_name == bot.config.owner:
             return bot.reply("Literally What?")
-        
         format_url = "https://raw.githubusercontent.com/teamsrg/willie-modules/master/modules/{0}.py"
         with open("{0}/{1}.py".format(module_dir, module_name), "wb") as fh:
             resp = requests.get(format_url.format(module_name), stream=True)
@@ -55,7 +49,7 @@ def webload(bot, trigger):
 
         bot.reply(module)
     elif not trigger.group(3):
-        bot.say("Usage: !weblist list, !weblist install module")
+        bot.say("Usage: !weblist list, !weblist sync module")
 
 # same for pms
 @willie.module.commands("webload")
