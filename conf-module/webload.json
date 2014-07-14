@@ -34,5 +34,6 @@
             "comment": "commands for the europeanspeedsterassembly.com marathon schedules",
             "depends": ["conf-module/esalong.tsv","conf-module/esashort.tsv"],
             "state": "future"
+        }
     }
 }
