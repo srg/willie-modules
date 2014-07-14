@@ -20,7 +20,7 @@ def webload(bot, trigger):
         return
     if trigger.group(3) == "list":
         bot.say("Available modules:")
-        for mod, val in modulelist["module-list"].items():
+        for mod, val in modulelist["modulelist"].items():
             bot.say("[\x033" + val["state"] + "\x03] \x037" + mod + ": \x0312"  + val["comment"])
     elif trigger.group(3) == "install":
         module_name = trigger.group(4)
