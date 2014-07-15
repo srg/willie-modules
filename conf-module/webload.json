@@ -31,9 +31,9 @@
             "state": "experimental"
         },
         "esa_sched": {
-            "comment": "commands for the europeanspeedsterassembly.com marathon schedules",
+            "comment": "commands for the ESA marathon schedules",
             "depends": ["conf-module/esalong.tsv", "conf-module/esashort.tsv"],
-            "state": "future"
+            "state": "stable"
         }
     }
 }

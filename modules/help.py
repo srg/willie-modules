@@ -15,7 +15,7 @@ from willie.tools import iterkeys
 
 def setup(bot):
     global admin_only
-    admin_only = ["blocks", "join", "load", "me", "mode", "msg", "part", "quit", "reload", "save", "set", "update", "webload"]
+    admin_only = ["blocks", "join", "load", "me", "mode", "msg", "part", "quit", "reload", "save", "set", "update", "webload", "esa"]
 
 
 @rule('$nick' '(?i)(help|doc) +([A-Za-z]+)(?:\?+)?$')
