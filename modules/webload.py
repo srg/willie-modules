@@ -33,7 +33,7 @@ def sync(bot, module_name):
     global williedir
     global modulelist
     if not module_name or module_name == bot.config.owner:
-        return bot.reply("Literally What?")
+        return bot.reply("No such module, use !webload list for available modules.")
     format_url = "https://raw.githubusercontent.com/teamsrg/willie-modules/master/"
     resp = requests.get(format_url + "modules/" + module_name + ".py", stream=True)
     if resp.status_code is not requests.codes.ok:
@@ -44,8 +44,8 @@ def sync(bot, module_name):
             if not chunk:
                 break
             fh.write(chunk)
-    if modulelist["modulelist"][module_name]["depends"]:
-        depends = modulelist["modulelist"][module_name]["depends"]
+    if modulelist[module_name]["depends"]:
+        depends = modulelist[module_name]["depends"]
         if isinstance(depends, basestring):
             getdepends(depends, format_url)
         else:
@@ -71,7 +71,7 @@ def webload(bot, trigger):
         return
     if trigger.group(3) == "list":
         bot.say("Available modules:")
-        for mod, val in modulelist["modulelist"].items():
+        for mod, val in modulelist.items():
             if os.path.isfile(williedir + "/modules/" + mod + ".py"):
                 comment = val["comment"] + " \x03[installed]"
             else:
@@ -80,7 +80,7 @@ def webload(bot, trigger):
     elif trigger.group(3) == "sync":
         sync(bot, trigger.group(4))
     elif trigger.group(3) == "update":
-        for mod, val in modulelist["modulelist"].items():
+        for mod, val in modulelist.items():
             if os.path.isfile(williedir + "/modules/" + mod + ".py"):
                 sync(bot, mod)
     elif trigger.group(3) == "remove":
@@ -88,12 +88,12 @@ def webload(bot, trigger):
         if os.path.isfile(removethis + ".py"):
             os.remove(removethis + ".py")
             os.remove(removethis + ".pyc")
-            bot.say("\x037" + trigger.group(4) + "\x03 removed.")
-            # test
+            bot.say("\x037" + trigger.group(4) + "\x03 removed. You should probably restart the bot.")
+            # bad idea, i don't want to advertise it too much
         else:
             bot.say("fug of :-D")
     elif not trigger.group(3):
-        bot.say("Usage: !weblist list, !weblist sync module, !weblist update")
+        bot.say("Usage: !weblist list, !weblist sync module, !weblist update. use !weblist remove at your own discretion.")
 
 # same for pms
 @willie.module.commands("webload")
