@@ -31,7 +31,7 @@
     },
     "esa_sched": {
         "comment": "commands for the ESA marathon Google Docs schedules",
-        "depends": ["conf-module/esalong.tsv", "conf-module/esashort.tsv"],
+        "depends": ["conf-module/esayellow.tsv", "conf-module/esablue.tsv"],
         "state": "stable"
     }
 }
