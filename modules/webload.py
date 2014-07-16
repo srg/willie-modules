@@ -13,7 +13,7 @@ def setup(bot):
     print williedir
 
 
-def getdepends(depend, format_url):
+def getdepends(depend, format_url, bot):
     abort_mission = 0
     dependresp = requests.get(format_url + depend, stream=True)
     if dependresp.status_code is not requests.codes.ok:
@@ -47,7 +47,7 @@ def sync(bot, module_name):
     if modulelist[module_name]["depends"]:
         depends = modulelist[module_name]["depends"]
         if isinstance(depends, basestring):
-            getdepends(depends, format_url)
+            getdepends(depends, format_url, bot)
         else:
             for depen in depends:
                 getdepends(depen, format_url)
