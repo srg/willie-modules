@@ -50,7 +50,7 @@ def sync(bot, module_name):
             getdepends(depends, format_url, bot)
         else:
             for depen in depends:
-                getdepends(depen, format_url)
+                getdepends(depen, format_url, bot)
     module = imp.load_source(module_name, "{0}/modules/{1}.py".format(williedir, module_name))
     if hasattr(module, "setup"):
         module.setup(bot)
