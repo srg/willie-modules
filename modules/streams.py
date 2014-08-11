@@ -19,13 +19,16 @@ def streams(bot,trigger):
     for streamer in twitchlist["streamlist"]:
         streamers.append(streamer + ",")
         streamlist = ''.join(streamers) # make a list of streamers, separated with ',' for our twitch api request
-    tw = requests.get('https://api.twitch.tv/kraken/streams?channel=' + streamlist)
+    try:
+        tw = requests.get('https://api.twitch.tv/kraken/streams?channel=' + streamlist)
+    except requests.ConnectionError:
+        bot.say("something went wrong w/ twitch")
     twjson = tw.json()
     hb = requests.get('https://www.hitbox.tv/api/team/speedfriends?filter=&limit=&liveonly=true&media=true') # hitbox srg team support
     hbjson = hb.json()
     for hbstream in hbjson['media']['livestream']: # hitbox.tv \o/
         counter += 1
-        online.append("\x037http://hitbox.tv/" + hbstream['media_user_name'] + "\x03 " + hbstream['media_status'] + " \x033|\x03 ")
+        online.append("\x0313http://hitbox.tv/" + hbstream['media_user_name'] + "\x03 " + hbstream['media_status'] + " \x0313|\x03 ")
         if counter % 4 == 0:
             linelist.append(online)
             online = []
