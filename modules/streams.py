@@ -3,9 +3,8 @@ from os.path import expanduser
 
 def setup(bot):
     global twitchlist
-    f = open("{0}/.willie/conf-module/streams.json".format(expanduser("~"))) # loads streams.json from USER_HOME/.willie/conf-module/
-    twitchlist = json.load(f)
-    f.close()
+    with open("{0}/.willie/conf-module/streams.json".format(expanduser("~"))) as f: # loads streams.json from USER_HOME/.willie/conf-module/
+        twitchlist = json.load(f)
 
 def lookup_twitch():
     global twitchlist
