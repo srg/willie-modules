@@ -20,7 +20,7 @@ def lookup_twitch():
 
 def lookup_hitbox(team="speedfriends"):
     try:
-        js = willie.web.get("https://api.hitbox.tv/team/%s?liveonly=true&media=true" % team, timeout=10, verify_ssl=False)
+        js = willie.web.get("https://api.hitbox.tv/team/%s?liveonly=true&media=true&fast=true"% team, timeout=10, verify_ssl=False)
         return json.loads(js)
     except:# same thing here
         return None
@@ -38,7 +38,7 @@ def streams(bot, trigger):
     if hb is not None:
         streams = hb["media"]["livestream"]
         for stream in streams:
-            msg += "\x0313https://hitbox.tv/%s\x03 %s \x0313|\x03 " % (stream["media_user_name"], stream["media_status"])
+            msg += "\x0313https://hitbox.tv/%s\x03 %s \x0313|\x03 " % (stream["media_display_name"].lower(), stream["media_status"])
             c += 1
             if c % 4 is 0:
                 msgs.append(msg)
