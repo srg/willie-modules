@@ -1,4 +1,4 @@
-import willie, requests
+import willie, requests, re
 
 @willie.module.commands('thread')
 @willie.module.thread(True)
@@ -10,7 +10,7 @@ def thread(bot, trigger):
     for idx, val in enumerate(jason):
         for idx2, val2 in enumerate(jason[idx]['threads']):
             threads = jason[idx]['threads'][idx2]
-            if "srg" in threads['sub'].lower(): # this will find 'srg' in the title field and return thread number ID of the first thread/with most recent activity
+            if re.search("se?rg", threads['sub'].lower()):
                 threadnum = threads['no']
                 found = 1
                 break
