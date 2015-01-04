@@ -120,7 +120,7 @@ def format_time_diff(seconds):
     return (days, hours, minutes)
 
 def format_run(run, show_time_until=False):
-    msg = "\x0308%s\x03 " % run["game"]
+    msg = "\x02\x0311%s\x03\x02 " % run["game"]
     msg += "(\x0307%s" % run["machine"]
     if run["comments"]:
         msg += ", %s" % run["comments"]
@@ -129,7 +129,6 @@ def format_run(run, show_time_until=False):
     if run["commentators"]:
         msg += " (\x0310%s\x03)" % run["commentators"]
     diff_seconds = get_time_diff(run)
-    print diff_seconds
     if show_time_until and diff_seconds > 0:
         days, hours, mins = format_time_diff(diff_seconds)
         msg += " in about \x0312"
