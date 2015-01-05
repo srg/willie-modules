@@ -176,6 +176,8 @@ def format_runs(runs):
             msgs.append(msg[:-3])
             msg = ""
         pieceofshit += 1
+    if len(runs) is 1:# top kek >:(
+        msgs.append(msg[:-3])
     return msgs
 
 def get_query(trigger):
@@ -193,6 +195,7 @@ def cmd_find_game(bot, trigger):
     runs = find_runs(query, key="game")
     if not runs:
         return
+    m = format_runs(runs)
     for msg in format_runs(runs):
         bot.say(msg)
 
