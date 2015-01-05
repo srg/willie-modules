@@ -12,7 +12,7 @@ max_runs_per_msg = 2
 max_msgs = 3
 
 def setup(bot):
-    check_runs(bot)
+    check_runs(bot, False)
 
 @thread(True)
 def fetch_run_table(url="https://gamesdonequick.com/schedule"):
@@ -65,12 +65,12 @@ def update_runs():
 
 @thread(True)
 @interval(300)# 5 minutes
-def check_runs(bot):
+def check_runs(bot, send_msg=True):
     update_runs()
-    update_cur_run(bot)
+    update_cur_run(bot, send_msg)
 
 @interval(120)# 2 minutes
-def update_cur_run(bot):
+def update_cur_run(bot, send_msg=True):
     global runs, run_cur, run_prev, run_next
     run_cur_new = None
     run_cur_new_diff = -999999
@@ -93,6 +93,8 @@ def update_cur_run(bot):
             run_prev = runs[run_cur["index"] - 1]
         if run_cur["index"] < len(runs) - 1:
             run_next = runs[run_cur["index"] + 1]
+        if not send_msg:
+            return
         for channel in bot.config.core.get_list("channels"):
             bot.msg(channel, "Game starting: %s" % format_run(run_cur))
 
