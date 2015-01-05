@@ -58,12 +58,10 @@ def update_runs():
     global runs, last_runs_upd
     run_table = fetch_run_table()
     runs_new = parse_run_table(run_table)
-    print "runs_new: %d" % len(runs_new)
     if not runs_new:
         return
     runs = runs_new
     last_runs_upd = datetime.utcnow()
-    print "runs: %d" % len(runs)
 
 @thread(True)
 @interval(300)# 5 minutes
