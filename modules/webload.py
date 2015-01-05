@@ -7,7 +7,7 @@ from os.path import expanduser
 
 def setup(bot):
     global modulelist
-    modulelist = requests.get("https://raw.githubusercontent.com/teamsrg/willie-modules/master/conf-module/webload.json").json()
+    modulelist = requests.get("https://raw.githubusercontent.com/srg/willie-modules/master/conf-module/webload.json").json()
     global williedir
     williedir = os.path.dirname(os.path.realpath(__file__ + "/../"))
     print williedir
@@ -34,7 +34,7 @@ def sync(bot, module_name):
     global modulelist
     if not module_name or module_name == bot.config.owner:
         return bot.reply("No such module, use !webload list for available modules.")
-    format_url = "https://raw.githubusercontent.com/teamsrg/willie-modules/master/"
+    format_url = "https://raw.githubusercontent.com/srg/willie-modules/master/"
     resp = requests.get(format_url + "modules/" + module_name + ".py", stream=True)
     if resp.status_code is not requests.codes.ok:
         bot.reply("Response code for '{0}' not OK: {1}".format(module_name, resp.status_code))
