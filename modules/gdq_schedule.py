@@ -6,9 +6,13 @@ import willie
 from willie.module import thread, commands, interval, rate
 
 testdate = ""
+run_cur = run_prev = run_next = None
+runs = []
+max_runs_per_msg = 2
+max_msgs = 3
 
 def setup(bot):
-    update_runs()
+    check_runs(bot)
 
 @thread(True)
 def fetch_run_table(url="https://gamesdonequick.com/schedule"):
@@ -51,46 +55,50 @@ def parse_run_table(run_table):
     return runs
 
 def update_runs():
-    global runs, run_cur, run_prev, run_next, last_runs_upd
+    global runs, last_runs_upd
     run_table = fetch_run_table()
     runs_new = parse_run_table(run_table)
+    print "runs_new: %d" % len(runs_new)
     if not runs_new:
         return
     runs = runs_new
-    the_run = None
-    the_run_diff = -999999
-    for run in runs:
-        sec = get_time_diff(run)
-        if sec > 0:
-            break
-        if not the_run or (sec <= 0 and sec > the_run_diff):
-            the_run = run
-            the_run_diff = get_time_diff(the_run)
-            continue
-    run_cur = run_prev = run_next = None
-    if the_run:
-        run_cur = the_run
-    if run_cur and run_cur["index"] > 0:
-        run_prev = runs[run_cur["index"] - 1]
-    if run_cur and run_cur["index"] < len(runs) - 1:
-        run_next = runs[run_cur["index"] + 1]
-    elif not run_cur:
-        run_next = runs[0]
     last_runs_upd = datetime.utcnow()
+    print "runs: %d" % len(runs)
 
 @thread(True)
 @interval(300)# 5 minutes
 def check_runs(bot):
-    global run_cur
-    game_cur = None
-    if run_cur:
-        game_cur = run_cur["game"]
     update_runs()
-    if run_cur and game_cur != run_cur["game"]:
+    update_cur_run(bot)
+
+@interval(120)# 2 minutes
+def update_cur_run(bot):
+    global runs, run_cur, run_prev, run_next
+    run_cur_new = None
+    run_cur_new_diff = -999999
+    for run in runs:
+        sec = get_time_diff(run)
+        if sec > 0:
+            break
+        if not run_cur_new or (sec <= 0 and sec > run_cur_new_diff):
+            run_cur_new = run
+            run_cur_new_diff = get_time_diff(run_cur_new)
+    if not run_cur_new:
+        run_next = runs[0]
+        return
+    game_old = None
+    if run_cur:
+        game_old = run_cur["game"]
+    run_cur = run_cur_new
+    if run_cur and game_old != run_cur["game"]:
+        if run_cur["index"] > 0:
+            run_prev = runs[run_cur["index"] - 1]
+        if run_cur["index"] < len(runs) - 1:
+            run_next = runs[run_cur["index"] + 1]
         for channel in bot.config.core.get_list("channels"):
             bot.msg(channel, "Game starting: %s" % format_run(run_cur))
 
-def find_runs(query, key="game", limit=3):
+def find_runs(query, key="game", limit=max_runs_per_msg * max_msgs):# limit of 6 should limit it to 2 runs per message, 3 messages
     query = query.lower()
     results = []
     count = 0
@@ -129,7 +137,9 @@ def format_run(run, show_time_until=False):
     if run["commentators"]:
         msg += " (\x0310%s\x03)" % run["commentators"]
     diff_seconds = get_time_diff(run)
-    if show_time_until and diff_seconds > 0:
+    if not show_time_until:
+        return msg
+    if diff_seconds > 0:
         days, hours, mins = format_time_diff(diff_seconds)
         msg += " in about \x0312"
         if days:
@@ -140,16 +150,33 @@ def format_run(run, show_time_until=False):
             msg += "%d minutes, " % mins
         msg = msg[:-2]
         msg += "\x03"
-    elif show_time_until and diff_seconds == 0:
+    elif diff_seconds < 0:
+        diff_seconds = get_time_diff(runs[run["index"] + 1])# lol
+        days, hours, mins = format_time_diff(-diff_seconds)
+        msg += " about \x0312"
+        if days:
+            msg += "%d days, " % days
+        if hours:
+            msg += "%d hours, " % hours
+        if mins:
+            msg += "%d minutes, " % mins
+        msg = msg[:-2]
+        msg += " ago\x03"
+    elif diff_seconds == 0:
         msg += " \x0312is starting\x03"
     return msg
 
 def format_runs(runs):
+    msgs = []
     msg = ""
+    pieceofshit = 1
     for run in runs:
         msg += "%s | " % format_run(run, True)
-    msg = msg[:-3]
-    return msg
+        if pieceofshit is not 0 and pieceofshit % max_runs_per_msg is 0:
+            msgs.append(msg[:-3])
+            msg = ""
+        pieceofshit += 1
+    return msgs
 
 def get_query(trigger):
     query = trigger.group(0)
@@ -164,8 +191,10 @@ def cmd_find_game(bot, trigger):
         bot.say("Usage: .g|game query")
         return
     runs = find_runs(query, key="game")
-    if runs:
-        bot.say(format_runs(runs))
+    if not runs:
+        return
+    for msg in format_runs(runs):
+        bot.say(msg)
 
 @commands("runner", "runners", "r")
 @rate(5)
@@ -175,8 +204,10 @@ def cmd_find_runner(bot, trigger):
         bot.say("Usage: .r|runner|runners query")
         return
     runs = find_runs(query, key="runners")
-    if runs:
-        bot.say(format_runs(runs))
+    if not runs:
+        return
+    for msg in format_runs(runs):
+        bot.say(msg)
 
 @commands("couch", "commentators")
 @rate(5)
@@ -186,8 +217,10 @@ def cmd_find_commentators(bot, trigger):
         bot.say("Usage: .couch|commentators query")
         return
     runs = find_runs(query, key="commentators")
-    if runs:
-        bot.say(format_runs(runs))
+    if not runs:
+        return
+    for msg in format_runs(runs):
+        bot.say(msg)
 
 @commands("machine", "console", "m")
 @rate(5)
@@ -197,8 +230,10 @@ def cmd_find_machine(bot, trigger):
         bot.say("Usage: .m|machine|console query")
         return
     runs = find_runs(query, key="machine")
-    if runs:
-        bot.say(format_runs(runs))
+    if not runs:
+        return
+    for msg in format_runs(runs):
+        bot.say(msg)
 
 @commands("cur", "current", "c")
 @rate(5)
@@ -211,10 +246,15 @@ def cmd_current(bot, trigger):
 @commands("prev", "previous", "p")
 @rate(5)
 def cmd_prev(bot, trigger):
-    global run_prev
+    global run_prev, run_cur
     if not run_prev:
         return
-    bot.say("The previous game was %s" % format_run(run_prev))
+    msg = format_run(run_prev, True)
+    if run_next["index"] - 1 > 0:# a shitty way to do it but eh, eh
+        msg += " | %s" % format_run(runs[run_prev["index"] - 1], True)
+    if run_next["index"] - 2 > 0:
+        msg += " | %s" % format_run(runs[run_prev["index"] - 2], True)
+    bot.say("The previous games were %s" % msg)
 
 @commands("next", "n")
 @rate(5)
@@ -222,7 +262,12 @@ def cmd_next(bot, trigger):
     global run_next
     if not run_next:
         return
-    bot.say("The next game is %s" % format_run(run_next, True))
+    msg = format_run(run_next, True)
+    if run_next["index"] + 1 < len(runs) - 1:# a shitty way to do it but eh
+        msg += " | %s" % format_run(runs[run_next["index"] + 1], True)
+    if run_next["index"] + 2 < len(runs) - 1:
+        msg += " | %s" % format_run(runs[run_next["index"] + 2], True)
+    bot.say("The next games are %s" % msg)
 
 @commands("schedule", "s")
 @rate(5)
@@ -232,7 +277,7 @@ def cmd_schedule(bot, trigger):
 @commands("help", "h")
 @rate(20)
 def cmd_help(bot, trigger):
-    bot.reply("Usage: .g|game|r|runner|runners|couch|commentators|m|machine|console query, .c|cur|current, .p|prev|previous, .n|next, .s|schedule")
+    bot.reply("Usage: .g|game|r|runner|runners|couch|commentators|m|machine|console query, .c|cur|current, .p|prev|previous x, .n|next x, .s|schedule")
 
 @commands("setdate")
 def setdate(bot, trigger):
