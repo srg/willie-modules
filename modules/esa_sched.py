@@ -22,6 +22,9 @@ max_runs_per_msg = 2
 max_msgs = 3
 
 def setup(bot):
+    global old1, old2
+    old1 = None 
+    old2 = None
     check_runs(bot, False)
 
 def get_data(url, start):
@@ -90,27 +93,17 @@ def check_runs(bot, send_msg=True):
 
 @interval(120)
 def update_cur_run(bot, send_msg=True):
-    global first, second, run_cur1, run_cur2
-    run_cur_new1 = None
-    run_cur_new2 = None
-    run_cur1 = get_cur(first)
-    run_cur2 = get_cur(second)
-    game_old1 = None
-    game_old2 = None
-    if run_cur1:
-        game_old1 = run_cur1["game"]
-    if run_cur2:
-        game_old2 = run_cur2["game"]
-    if game_old1 and run_cur1 != run_cur1["game"]:
-        if not send_msg:
-            return
+    global first, second, old1, old2
+    cur_run1 = get_cur(first)
+    cur_run2 = get_cur(second)
+    if old1 != cur_run1:
+        old1 = cur_run1
         for channel in bot.config.core.get_list("channels"):
-            bot.msg(channel, "Game starting: %s" % format_run(run_cur1))
-    if game_old2 and run_cur2 != run_cur2["game"]:
-        if not send_msg:
-            return
+            bot.msg(channel, "Game starting (Main stream): %s" % format_run(cur_run1))
+    if old2 != cur_run2:
+        old2 = cur_run2
         for channel in bot.config.core.get_list("channels"):
-            bot.msg(channel, "Game starting: %s" % format_run(run_cur2))
+            bot.msg(channel, "Game starting (Secondary stream): %s" % format_run(cur_run2))
 
 def find_runs(query, key="game", limit=max_runs_per_msg * max_msgs):# limit of 6 should limit it to 2 runs per message, 3 messages
     global first, second
