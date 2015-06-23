@@ -60,20 +60,17 @@ def get_next(runlist):
 
 def get_prev(runlist):
     for item in runlist:
-        if item["absolute_time"] > datetime.now(pytz.utc):
+        if item["absolute_time"] + timedelta(minutes=item["estimate"]) > datetime.now(pytz.utc):
             index = item["order"] - 1
             if index < 0:
                 break
             else:
                 return runlist[index]
-                break
 
 def get_cur(runlist):
     for item in runlist:
-        if item["absolute_time"] >= datetime.now(pytz.utc) > runlist[item["order"] + 1]["absolute_time"]:
+        if item["absolute_time"] <= datetime.now(pytz.utc) < item["absolute_time"] + timedelta(minutes=item["estimate"]):
             return item
-        else:
-            break
 
 def list_all(runlist):
     for item in runlist:
@@ -113,7 +110,7 @@ def update_cur_run(bot, send_msg=True):
         if not send_msg:
             return
         for channel in bot.config.core.get_list("channels"):
-            bot.msg(channel, "Game starting: %s" % format_run(run_cur1))
+            bot.msg(channel, "Game starting: %s" % format_run(run_cur2))
 
 def find_runs(query, key="game", limit=max_runs_per_msg * max_msgs):# limit of 6 should limit it to 2 runs per message, 3 messages
     global first, second
@@ -220,15 +217,17 @@ def cmd_prev(bot, trigger):
 @commands("cur", "current", "c")
 @rate(5)
 def cmd_current(bot, trigger):
-    global run_cur1, run_cur2
+    global first, second
+    cur1 = get_cur(first)
+    cur2 = get_cur(second)
     send = "The current games are: "
-    if run_cur1:
-        send += "%s (Main stream)" % format_run(run_cur1)
-    if run_cur2:
-        if run_cur1:
+    if cur1:
+        send += "%s (Main stream)" % format_run(cur1)
+    if cur2:
+        if cur1:
             send += ", "
-        send += "%s (Secondary stream)" % format_run(run_cur2)
-    if not (run_cur1 or run_cur2):
+        send += "%s (Secondary stream)" % format_run(cur2)
+    if not (cur1 or cur2):
         send = "There is no current game."
     bot.say(send)
 
@@ -244,11 +243,12 @@ def cmd_update(bot, trigger):
     check_runs(bot)
 
 def time_until(item):
-    until = item["absolute_time"] - datetime.now(pytz.utc)
     if item["absolute_time"] >= datetime.now(pytz.utc):
-        time_until = "[Starts in %s]" % str(until).split('.', 1)[0]
+        time_until = "[Starts in %s]" % str(item["absolute_time"] - datetime.now(pytz.utc)).split('.', 1)[0]
+    elif item["absolute_time"] <= datetime.now(pytz.utc) < item["absolute_time"] + timedelta(minutes=item["estimate"]):
+        time_until = "[Currently ongoing]"
     else:
-        time_until = "[%s ago]" % str(until).split('.', 1)[0][1:]
+        time_until = "[%s ago]" % str(datetime.now(pytz.utc) - item["absolute_time"]).split('.', 1)[0]
     return time_until
 
 def format_run(item, show_time_until=False):
