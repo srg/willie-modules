@@ -35,6 +35,10 @@ def get_data(url, start):
         absolute_time = start + timedelta(minutes=cur_time)
         estimate = int(entry["time"])
         cur_time += estimate
+        if entry["schedule"] == "ihfgl":
+            stream = "main"
+        else:
+            stream = "secondary"
 
         runlist.append({'order':  int(entry["order"]) - 1,
                         'player':  entry["player"],
@@ -42,7 +46,8 @@ def get_data(url, start):
                         'category': entry["category"],
                         'console': entry["console"],
                         'absolute_time': absolute_time,
-                        'estimate': estimate})
+                        'estimate': estimate,
+                        'stream': stream})
     return runlist
 
 def update_lists():
@@ -75,16 +80,6 @@ def get_cur(runlist):
         if item["absolute_time"] <= datetime.now(pytz.utc) < item["absolute_time"] + timedelta(minutes=item["estimate"]):
             return item
 
-def list_all(runlist):
-    for item in runlist:
-        print_item(item)
-
-def search_item(term, runlist):
-    results = []
-    for item in runlist:
-        if term.lower() in (item["game"].lower() or item["player"].lower()):
-            results.append(item)
-
 @thread(True)
 @interval(120)
 def check_runs(bot, send_msg=True):
@@ -99,11 +94,11 @@ def update_cur_run(bot, send_msg=True):
     if old1 != cur_run1:
         old1 = cur_run1
         for channel in bot.config.core.get_list("channels"):
-            bot.msg(channel, "Game starting (Main stream): %s" % format_run(cur_run1))
+            bot.msg(channel, "\x0307A\x03: Game starting: %s | http://twitch.tv/europeanspeedsterassembly" % format_run(cur_run1))
     if old2 != cur_run2:
         old2 = cur_run2
         for channel in bot.config.core.get_list("channels"):
-            bot.msg(channel, "Game starting (Secondary stream): %s" % format_run(cur_run2))
+            bot.msg(channel, "\x03071\x03: Game starting: %s | http://twitch.tv/esamarathon2" % format_run(cur_run2))
 
 def find_runs(query, key="game", limit=max_runs_per_msg * max_msgs):# limit of 6 should limit it to 2 runs per message, 3 messages
     global first, second
@@ -173,15 +168,11 @@ def cmd_next(bot, trigger):
     next2 = get_next(second)
     send = "The next games are: "
     if next1:
-        until1 = time_until(next1)
-        msg1 = format_run(next1)
-        send += "%s %s (Main stream)" % (msg1, until1)
+        send += "\x0307A\x03: %s" % format_run(next1, True)
     if next2:
         if next1:
             send += ", "
-        until2 = time_until(next2)
-        msg2 = format_run(next2)
-        send += "%s %s (Secondary stream)" % (msg2, until2)
+        send += "\x03061\x03: %s" % format_run(next2, True)
     if not (next1 or next2):
         send = "There are no future games."
     bot.say(send)
@@ -194,15 +185,11 @@ def cmd_prev(bot, trigger):
     prev2 = get_prev(second)
     send = "The previous games were: "
     if prev1:
-        ago1 = time_until(prev1)
-        msg1 = format_run(prev1)
-        send += "%s %s (Main stream)" % (msg1, ago1)
+        send += "\x0307A\x03: %s" % format_run(prev1, True)
     if prev2:
         if prev1:
             send += ", "
-        ago2 = time_until(prev2)
-        msg2 = format_run(prev2)
-        send += "%s %s (Secondary stream)" % (msg2, ago2)
+        send += "\x03061\x03: %s" % format_run(prev2, True)
     if not (prev1 or prev2):
         send = "There have been no games yet."
     bot.say(send)
@@ -215,11 +202,11 @@ def cmd_current(bot, trigger):
     cur2 = get_cur(second)
     send = "The current games are: "
     if cur1:
-        send += "%s (Main stream)" % format_run(cur1)
+        send += "\x0307A\x03: %s" % format_run(cur1)
     if cur2:
         if cur1:
             send += ", "
-        send += "%s (Secondary stream)" % format_run(cur2)
+        send += "\x03061\x03: %s" % format_run(cur2)
     if not (cur1 or cur2):
         send = "There is no current game."
     bot.say(send)
@@ -237,30 +224,35 @@ def cmd_update(bot, trigger):
 
 def time_until(item):
     if item["absolute_time"] >= datetime.now(pytz.utc):
-        time_until = "[Starts in %s]" % str(item["absolute_time"] - datetime.now(pytz.utc)).split('.', 1)[0]
+        time_until = "Starts in %s" % str(item["absolute_time"] - datetime.now(pytz.utc)).split('.', 1)[0]
     elif item["absolute_time"] <= datetime.now(pytz.utc) < item["absolute_time"] + timedelta(minutes=item["estimate"]):
-        time_until = "[Currently ongoing]"
+        time_until = "Currently ongoing"
     else:
-        time_until = "[%s ago]" % str(datetime.now(pytz.utc) - item["absolute_time"]).split('.', 1)[0]
+        time_until = "%s ago" % str(datetime.now(pytz.utc) - item["absolute_time"]).split('.', 1)[0]
     return time_until
 
 def format_run(item, show_time_until=False):
-    estimate = timedelta(minutes=item["estimate"])
-    if item["player"] == "????":
-        msg = "--- %s [Estimate: %s] ---" % (item["game"], estimate)
-    elif item["player"] == "":
-        msg = "-- %s [Estimate: %s] --" % (item["game"], estimate)
-    elif item["game"] == "Mystery Tournament":
-        msg = "-- %s (%s), %s [Estimate: %s] --" % \
-              (item["game"], item["category"], item["player"], estimate)
-    elif item["category"] == "Tournament finals":
-        msg = "-- %s %s, %s [Estimate: %s] --" % \
-              (item["game"], item["category"], item["player"], estimate)
+    i = {}
+    if item["stream"] == "main":
+        color = "\x0307"
+        i["game"] = "\x0307" + item["game"] + "\x03"
     else:
-        msg = "%s (%s) by %s [Estimate: %s]" % \
-              (item["game"], item["category"], item["player"], estimate)
+        color = "\x0306"
+        i["game"] = "\x0306" + item["game"] + "\x03"
+
+    i["category"] = "\x0303" + item["category"] + "\x03"
+    i["player"] = "\x0305" + item["player"] + "\x03"
+    estimate = "\x0312%s\x03" % timedelta(minutes=item["estimate"])
+    if item["player"] == "????":
+        msg = u"--- {0[game]} [{1}] ---".format(i, estimate)
+    elif item["player"] == "":
+        msg = u"-- {0[game]} [{1}] --".format(i, estimate) 
+    elif (item["game"] == "Mystery Tournament") or (item["category"] == "Tournament finals"):
+        msg = u"-- \x02{0[game]}\x02 ({0[category]}), {0[player]} [{1}] --".format(i, estimate)
+    else:
+        msg = u"\x02{0[game]}\x02 ({0[category]}) by {0[player]} [{1}]".format(i, estimate)
     if show_time_until:
-        msg += " %s" % time_until(item)
+        msg += " [%s%s\x03]" % (color, time_until(item))
     return msg
 
 def get_query(trigger):
