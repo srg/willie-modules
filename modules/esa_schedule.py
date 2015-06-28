@@ -66,6 +66,15 @@ def get_next(runlist):
             return item
             break
 
+def get_next3(runlist):
+    c = 0
+    l = []
+    for item in runlist:
+        if item["absolute_time"] > datetime.now(pytz.utc) and c < 3:
+            l.append(item)
+            c += 1
+    return tuple(l)
+
 def get_prev(runlist):
     for item in runlist:
         if item["absolute_time"] + timedelta(minutes=item["estimate"]) > datetime.now(pytz.utc):
@@ -176,6 +185,31 @@ def cmd_next(bot, trigger):
     if not (next1 or next2):
         send = "There are no future games."
     bot.say(send)
+
+@commands("next3", "n3")
+@rate(5)
+def cmd_next3(bot, trigger):
+    global first, second
+    next11, next12, next13 = get_next3(first)
+    next21, next22, next23 = get_next3(second)
+    send = "The next games are: "
+    if next11:
+        send += "\x0307A\x03: %s" % format_run(next11, True)
+    if next12:
+        send += ", \x0307A\x03: %s" % format_run(next12, True)
+    if next13:
+        send += ", \x0307A\x03: %s" % format_run(next13, True)
+    if next11:
+        bot.say(send)
+    send = "The next games are: "
+    if next21:
+        send += "\x03061\x03: %s" % format_run(next21, True)
+    if next22:
+        send += ", \x03061\x03: %s" % format_run(next22, True)
+    if next23:
+        send += ", \x03061\x03: %s" % format_run(next23, True)
+    if next21:
+        bot.say(send)
 
 @commands("prev", "p")
 @rate(5)
