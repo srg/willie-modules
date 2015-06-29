@@ -13,6 +13,8 @@ import pytz
 from os.path import expanduser, getmtime
 import willie
 from willie.module import thread, commands, interval, rate
+import tweepy
+
 
 MAIN_URL = "http://www.speedrun.com/esa2015/rawschedule/ihfgl" 
 SECONDARY_URL = "http://www.speedrun.com/esa2015/rawschedule/jguzf" 
@@ -98,14 +100,22 @@ def check_runs(bot, send_msg=True):
 @interval(120)
 def update_cur_run(bot, send_msg=True):
     global first, second, old1, old2
+    auth = tweepy.OAuthHandler(bot.config.twitter.consumer_key, bot.config.twitter.consumer_secret)
+    auth.set_access_token(bot.config.twitter.access_token, bot.config.twitter.access_token_secret)
+    api = tweepy.API(auth, secure=True, api_root="/1.1")
     cur_run1 = get_cur(first)
     cur_run2 = get_cur(second)
     if old1 != cur_run1:
         old1 = cur_run1
+        twit = "%s | http://twitch.tv/esa #ESA15" % tweet_run(cur_run1)
+        print twit
+        api.update_status(twit)
         for channel in bot.config.core.get_list("channels"):
             bot.msg(channel, "\x0307A\x03: Game starting: %s | http://twitch.tv/europeanspeedsterassembly" % format_run(cur_run1))
     if old2 != cur_run2:
         old2 = cur_run2
+        twit = "%s | http://twitch.tv/esamaraton2 #ESA15" % tweet_run(cur_run2)
+        api.update_status(twit)
         for channel in bot.config.core.get_list("channels"):
             bot.msg(channel, "\x03071\x03: Game starting: %s | http://twitch.tv/esamarathon2" % format_run(cur_run2))
 
@@ -287,6 +297,24 @@ def format_run(item, show_time_until=False):
         msg = u"\x02{0[game]}\x02 ({0[category]}) by {0[player]} [{1}]".format(i, estimate)
     if show_time_until:
         msg += " [%s%s\x03]" % (color, time_until(item))
+    return msg
+
+def tweet_run(item, show_time_until=False):
+    i = {}
+    i["category"] = item["category"]
+    i["player"] = item["player"]
+    i["game"] = item["game"]
+    estimate = "%s" % timedelta(minutes=item["estimate"])
+    if item["player"] == "????":
+        msg = u"--- {0[game]} [{1}] ---".format(i, estimate)
+    elif item["player"] == "":
+        msg = u"-- {0[game]} [{1}] --".format(i, estimate) 
+    elif (item["game"] == "Mystery Tournament") or (item["category"] == "Tournament finals"):
+        msg = u"-- {0[game]} ({0[category]}), {0[player]} [{1}] --".format(i, estimate)
+    else:
+        msg = u"{0[game]} ({0[category]}) by {0[player]} [{1}]".format(i, estimate)
+    if show_time_until:
+        msg += " [%s]" % (time_until(item))
     return msg
 
 def get_query(trigger):
